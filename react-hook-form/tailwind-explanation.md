@@ -17,10 +17,6 @@ When to Use: You should include this directive once at the beginning of your mai
 baseline across browsers.
 Example:
 
-3. @tailwind components
-Purpose: This directive includes any component-level styles defined by Tailwind. It’s where you can define custom component
-styles using the @apply directive.
-
 When to Use: Use this when you want to build reusable components (like buttons, cards, etc.) that leverage Tailwind’s
 utilities.
 
@@ -31,7 +27,12 @@ Example:
   @apply bg-blue-500 text-white rounded-lg px-4 py-2;
 }
 
-4. @tailwind utilities
+2. @tailwind components
+
+@tailwind components directive injects Tailwind's pre-designed component-level styles like buttons and forms. It’s used
+to manage reusable component styles before utilities are applied.
+
+3. @tailwind utilities
 Purpose: This directive includes all of Tailwind’s utility classes, which you can use directly in your HTML for rapid styling.
 When to Use: Include this in your main CSS file to enable the use of Tailwind’s utility classes throughout your project.
 Example:
@@ -46,15 +47,26 @@ in summary
 
 and @apply is used when we want to override tailwind default styles.
 
-For instance, if we want to customize a button's styles beyond what taylwind provides, we would define a new class in the
-@tailwind components section and use @apply to pull in the utilities we need, like this
+Here on our index.css we have, for example, this
 
-@tailwind base;
-@tailwind components;
-
-.btn {
-  @apply bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-700;
+button,
+button[type="submit"] {
+  @apply rounded-md bg-gradient-to-r from-primary-500 to-secondary-600 px-6 py-2 text-black hover:opacity-50;
 }
 
-@tailwind utilities;
+So every button we create is going to have those custom classes, but i said that apply must be used within the @components
+directive.
+This is working because the @tailwind base, components and utilities directives define where Tailwind injects its
+pre-configured styles.
+Basically this is working like in the three first lines
+@tailwind base: Injects the base styles, which include browser resets and global styles.
+@tailwind components: Injects component-level styles (such as buttons, cards, etc.);
+@tailwind utilities: Injects utility classes like margin, padding, flex, etc.
 
+When we add custom styles outside of these directives, like body, button and input as we are doing, they're applied after
+the tailwind directives. This is allowed because the custom styles are processed after the core styles, so they overide
+them if necessary.
+
+So, it's not necessary four our custom styles to be inside the @components directive for them to work
+We can place custom styles anywhere in the CSS file as long as they're after the Tailwind directives, ensuring they
+override any conflicting tailwind styles.
