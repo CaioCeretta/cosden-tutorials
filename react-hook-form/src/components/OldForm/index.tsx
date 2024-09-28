@@ -1,8 +1,6 @@
 'use client'
 
-import { useState, FormEvent } from "react";
-
-
+import { FormEvent, useState } from "react";
 
 export default function OldForm() {
   const [email, setEmail] = useState("")
@@ -15,21 +13,21 @@ export default function OldForm() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    //Because this is a new submission
+    // Clear errors for new submission
     setErrors({ email: "", password: "" });
 
     // Manual validation
     if (!email.includes("@")) {
-      setErrors({ ...errors, email: "E-mail must include a @" })
+      setErrors({ ...errors, email: "E-mail must include a @" });
       return;
     }
 
     if (password.length < 8) {
-      setErrors({ ...errors, password: "Password must be at least 8 characters" })
+      setErrors({ ...errors, password: "Password must be at least 8 characters" });
       return;
     }
 
-    console.log('Form Submitted')
+    console.log('Form Submitted');
   }
 
   return (
@@ -39,6 +37,7 @@ export default function OldForm() {
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        className={errors.email ? "border-red-500" : ""}
       />
 
       <input
@@ -46,8 +45,8 @@ export default function OldForm() {
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        className={errors.password ? "border-red-500" : ""}
       />
-
 
       {errors.password && <div className="text-red-500">{errors.password}</div>}
       {errors.email && <div className="text-red-500">{errors.email}</div>}

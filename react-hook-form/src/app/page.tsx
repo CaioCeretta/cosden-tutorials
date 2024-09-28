@@ -1,7 +1,7 @@
-import OldForm from "@/OldForm";
+import NewForm from "@/components/NewForm";
 
 export default function Home() {
   return (
-    <OldForm />
+    <NewForm />
   )
 }
