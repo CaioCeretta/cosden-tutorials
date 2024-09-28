@@ -248,6 +248,98 @@ we can simply use the disabled attribute from the button with this variable
   }
 </button>
 
+Just like that, our form now supports async functions. And all that we had to do was literally just convert this to an
+async function and just await something inside of it, that rhf would take care of the rest.
+
+Another cool feature of rhf is that, last say that instead of just awaiting the promise, we were actually sending something
+to a backend, the backend can sometimes throw an error if something is invalid, and we need to handle the error sent from
+the backend, we need to show the error to the user and ideally we need to plug it inside of our form.
+
+To do this rhf also makes it easy for us, by getting the setError from the useForm() call, this will allow u s to programmatically
+set an error in our form.
+
+So what we could do, is on the onSubmit, wrap everything inside a try catch block, and on the catch, utilize that setError
+we just destructured, so
+
+setError("someFormField", {
+  message: "some message to the error"
+})
+
+and the last thing we need to do, is to throw an error in the try block, so the catch will be executed 
+
+Now, if we submit the form, it will load for one second and show us that error message we just passed. Now we've just gotten
+and error from the backend, an asynchronous error, and we've plugged it inside of our form directly using setError
+
+But what if we wanted this error to actually not belong to any specific input field, but rather to belong to the form as
+a whole?
+We can do this, by using the first parameter of the setError, to root. We can use root for an error that does not belong
+to any specific input field, but rather, belongs to the form as whole. And then all that we would need to do, is to go to
+our actual jsx, and just render out below the button, like this
+{errors.root && (
+  <div>
+    <p className="text-red-500">{errors.root.message}</p>
+  </div>
+)}
+
+Now here's one other thing we might want to use, let's say that we want this form to have some default values, because often
+times, we're not creating an entity, but we're editing an entity, and we want the properties of that entity to be pre-populated
+in our form. And the way that we implement that in rhf is to go where we have useForm(), and as an argument, just give an
+object and a property of defaultValues, where we can define those we want based on the type we passed.
+
+One thing to keep in mind is that we don't have to pass all the input fields, just the ones we want to have a default value
+
+3. Recommended way to use RHF (Zod)
+
+There's actually a better way to handle the validation, that is actually, a lot less code, this is going to involve using
+"Zod" as our validation library.
+
+To start using zod we need to install two more things, @hookforms/resolvers which will give us access to some resolvers
+and zod library 
+
+So now we are going to import {z} from 'zod' and define a schema for our form, like
+
+const formSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8)
+})
+
+then we can get rid of the FormFields because we can infer directly from the schema.
+
+type FormFields = z.infer<typeof formSchema>
+
+Now, on our form, besides the default values, we can use the zodResolver like this resolver: zodResolver(formSchema)
+
+what this is going to do, is connecting our schema to react hook, and this schema from zood, actually has a lot of validation
+already built-in, so if we look at the email, for example, it will first make sure that is a string, then it will check if
+it is a valid email.
+
+Now, because of this, we can remove all of our custom validation from the inputs, so 
+
+<input
+        type="text"
+        {...register('email', {
+          required: 'E-mail is required',
+          validate: (value) => {
+            if(!value.includes('@')) {
+              return 'E-mail input must include @ '
+            }
+            return true;
+          }
+        })}
+        placeholder="Email"
+      />
+
+will simply become 
+
+<input
+  type="text"
+  {...register('email')}
+  placeholder="Email"
+/>
+
+so now our code will become a lot simpler, because all of our validation is defined in zod.
+
+
 
 
 

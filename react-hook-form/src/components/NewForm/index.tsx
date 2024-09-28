@@ -1,34 +1,47 @@
 'use client'
 
+import { zodResolver } from "@hookform/resolvers/zod"
 import { SubmitHandler, useForm } from "react-hook-form"
+import * as z from 'zod'
 
-type FormFields = {
-  email: string;
-  password: string;
-}
+const formSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8)
+})
+
+type FormFields = z.infer<typeof formSchema>
 
 export default function NewForm() {
 
-  const {register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormFields>()
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting }
+  } = useForm<FormFields>({
+    defaultValues: {
+      email: 'caioceretta@gmail.com'
+    },
+    resolver: zodResolver(formSchema)
+  })
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    console.log(data)
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      throw new Error();
+      console.log(data)
+    } catch (error) {
+      setError("root", {
+        message: "This email is already taken"
+      } )
+    }
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="tutorial gap-2">
       <input
         type="text"
-        {...register('email', {
-          required: 'E-mail is required',
-          validate: (value) => {
-            if(!value.includes('@')) {
-              return 'E-mail input must include @ '
-            }
-            return true;
-          }
-        })}
+        {...register('email')}
         placeholder="Email"
       />
       {errors.email && (
@@ -40,13 +53,7 @@ export default function NewForm() {
       <input
         type="password"
         placeholder="Password"
-        {...register('password', {
-          required: 'Password is required',
-          minLength: {
-            value: 8,
-            message: 'Password must be at least 8 characters'
-          }
-        })}
+        {...register('password')}
       />
       {errors.password && (
         <div>
@@ -59,6 +66,12 @@ export default function NewForm() {
           isSubmitting ? "Loading..." : 'Submit'
         }
       </button>
+      {errors.root && (
+        <div>
+          <p className="text-red-500">{errors.root.message}</p>
+        </div>
+      )}
     </form>
   )
 }
+
