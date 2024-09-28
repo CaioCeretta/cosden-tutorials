@@ -309,6 +309,16 @@ type FormFields = z.infer<typeof formSchema>
 
 Now, on our form, besides the default values, we can use the zodResolver like this resolver: zodResolver(formSchema)
 
+The resolver with useForm is necessary if we want to validate the form schema using Zod. The resolver serves as a bridge
+between Zod (or any other schema validation library like Yup) and RHF.
+
+Without the zodResolver, rhf wouldn't know how to validate our form data agains the zod schema. rhf has built in validation,
+but it's more basic and doesn't support schema based validation out of the box. The resolver handles parsing data with zod
+schema and transform any zod validation errors into a format rhf can understand.
+
+If we don't use the resolver, we would have to manually validate form values using the schema in the onSubmit function or
+elsewhere. This is possible, but it would not be as tightly integrated as using the zodResolver
+
 what this is going to do, is connecting our schema to react hook, and this schema from zood, actually has a lot of validation
 already built-in, so if we look at the email, for example, it will first make sure that is a string, then it will check if
 it is a valid email.
@@ -338,6 +348,8 @@ will simply become
 />
 
 so now our code will become a lot simpler, because all of our validation is defined in zod.
+
+
 
 
 
